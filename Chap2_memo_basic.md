@@ -1,0 +1,391 @@
+## React面向组件编程
+- 05 模块化，组件化，工程化 定义
+  - 一个模块一般是一个js文件 BL？
+  - 组件component html里的div 大的功能点相关资源的集合
+    - 组件化编码
+- 05 React面向组件编程
+  - 01 函数式组件
+    - 函数不能直接渲染 渲染时给reactDOM传组件的标签 <MyComponent/>
+      - 因为是标签所以遵守xml大小写规则 首字母大写
+      - 渲染return的虚拟DOM
+    - babel翻译后开启了ES5中的严格模式 禁止自定义函数指向window
+      - 一般this指的是window
+        - window是啥
+        - 在浏览器环境中，window 是一个全局对象，它代表了浏览器窗口的全局上下文。它是 JavaScript 中的顶层对象，包含了许多有用的属性和方法，可以用来与浏览器窗口进行交互。
+    - {}空对象 null
+  - 复习01 类
+    - console里显示的Person {xxxx} 表示一个实例
+      - 表示一个Person new出来的实例对象
+    - 属性field，方法method，构造器方法constructor
+      - constructor可以不写，但是没啥含义
+      - ES6之后，class里的方法不写function
+    - 类中的一般方法 放在了原型对象上（而非实例对象）
+      - 属性属于实例，方法属于类
+    - call更改函数里的this指向
+      - p1.speak() 实例调用
+      - p1.speak.call({a:1,b:2}) call调用
+        - 在JavaScript中，call是函数的一个方法，用于调用函数并指定函数内部的this值和参数
+        - a和b是新定义的属性名 有就用 没有就是undefined
+      - 还有apply调用，bind调用
+    - 继承
+      - 写constructor的时候必须用super，super是父类的constructor，必须第一个写
+      - 所有属性在子类上，没写的方法不在子类上，在原型链上能找到 ``__proto__``
+      - 重写父类方法override后就有了
+  - 复习02 类式组件
+    - 函数式组件 函数名=组件名
+    - ①类式组件必须继承React内置的类
+    - 可以省略constructor
+    - ②必须写render() ③有返回值的
+      - 放在MyComponent的原型对象上
+      - React找到MyComponent new一个实例 并调用原型上的render方法 呈现return
+        - （复习：函数式组件是调用该函数并呈现return）
+    - render中的this是MyComponent组件实例（only for类式组件）
+      - 组件三大属性：props, refs, state
+      - context
+      - 都来自于父类（不是继承class里写的）
+- 06 组件实例的三大属性之state
+  - 理解state
+    - 有状态state的组件叫做复杂组件
+      - 函数式组件是简单组件
+    - 把数据放在状态里→导出页面
+    - function的this没有，class的实例才有
+    - React新功能hooks 函数也能有state
+  - 初始化state
+    - 写constructor传state
+      - 父类Component的state默认null（16.8版本之前是{}）
+      - 给他传一个对象like {isHot:true}
+      - 读{this.state.isHot ? 'xx' : 'yy'}
+        - or const {isHot} = this.state
+  - React里如何绑定事件
+    - 复习02 原生html的事件绑定
+      - ``<button onclick="demo()">``
+        - 表示button被click时执行demo
+    - ①onclick的写法
+      - 原生html标签里的onxxx在React里封装成了onXxx →×
+      - 组件里``return <button onClick="demo()">``
+    - ②demo要用{}
+      - "demo()"是字符串 要改成{demo()}
+      - onClick={demo()}表示demo的返回值undefined作为引数回调
+    - ③demo不能带()
+      - onClick={demo}是赋值语句 把右边函数交给onClick作为回调 返回值是函数
+  - 类中方法中的this
+    - babel里的function写的this是undefined，因为开启了严格模式
+      - 非严格模式下是window
+    - render里的this是组件实例对象
+    - 取到this的一个笨的写法
+      - 在class和render外定义一个that グローバル定数 that = this 缓存this
+    - 函数体里可以写任意代码 class里面定义方法不写function
+    - 在class的方法中调用另一个方法时要加this
+      - （复习：在class方法中可以调用this本身）
+      - 不加this属于直接调用 加this是给实例调用
+      - （Java里不需要だっけ？而且和顺序无关也不会报编译错误，因为貌似complier一开始就读完了class所有内容？）
+      - 比如
+        - 定义某方法speak()时要写this.study()
+        - 定义方法render()时要写onClick={this.demo}
+    - 所以绑定事件规则④demo前要加this
+      - onClick={this.demo}
+    - class里谁能调到this（来执行方法かな）
+      - React会通过实例调用render() OK
+      - constructor OK
+      - [ ] 生命周期钩子？
+      - render中的onClick={this.demo}不是 why↓
+        - （这里的this是的 但demo方法里的this不是）
+    - 复习03 类中方法this指向
+      - ``const p1 = new Person('tom',18)``
+      - ``p1.study()`` 
+        - 可以调到study中的this
+      - ``const x = p1.study``
+      - ``x()``
+        - 不能调到study中的this
+        - x是Person原型上的函数 x()是直接调用
+        - 调用某方法()的this默认window 但在x()是undefined
+          - 因为类中所有定义的方法都在局部开启了严格模式 类开的 不是babel
+        - 如果x是普通的某demo() this就会是window
+      - 两种内存
+        - 栈内存（instanceが存在する空間だと理解している）
+          - p1.study
+          - x
+        - 堆内存（原型读取出来的地方吧 静态的）
+          - function(){}
+    - so作为onClick的回调的this.changeWeather只是原型链上的方法的直接调用
+      - →this不是实例
+    - class中的changeWeather开启了严格模式
+      - →this是undefined
+  - 解决类中的this指向问题
+    - bind生成一个新的函数并且更改this（跟call很像哈）
+    - 在构造器里写bind就能创造一个this实例用的方法 赋值给this.changeWeather
+    - 优先执行构造器里的this.changeWeather 而非原型链上的function（构造器里已经找到了不会再往原型链上找了）
+    - 这时this.changeWeather里就可以用this当实例了
+    - 构造器里写一个this.changeWeather =ならわかるけど
+      - [ ] this.demo = this.changeWeather.bind(this) onClick={this.demo}这里的demo不需要定义一下吗？而且还是demo属性？
+      - どうやらthis.xxxのxxxはclass下のフィールドとからしい
+  - setState的使用
+    - 一定要用
+    - 修改state的时候React会重新render
+  - 简写state
+    - constructor和render肯定是有人new实例之后运行的所以this是实例
+    - 自定义方法大多数作为事件回调使用 onClick右边只是一个方法 没有指定this
+    - 复习
+      - 类
+        - 类中可以直接写赋值语句a=1 不能加let a（不是函数体）
+        - a就是类的属性
+        - 可以写在constructor下面
+        - state = xxxxx可以作为state使用
+    - 为了能使用this.方法
+      - 赋值语句changeWeather = function(){}
+        - [ ] 给class加了一个changeWeather属性（field） 内容为一个方法？？而且changeWeather并不是class上的方法？
+        - 此时changeWeather是在实例上的 原型链上没有changeWeather方法
+      - 要写箭头函数
+        - 箭头函数没有自己的this 但是写this的话会找函数外层的this
+        - 类中箭头函数里的this就是实例对象 就不需要用bind给this.xxx指定this了
+      - →所有自定义方法要写成赋值语句+箭头函数 不能放在原型上
+  - 总结state
+- 07 props
+  - props的基本使用
+    - 不传数据的时候是{}
+      - [ ] 怎么state不初始化的时候是null 和props不一样？
+    - render写标签时传key=value 就是传给props
+  - 批量传递props（=标签属性）
+    - {...p} 展开运算符 p是实例对象
+    - 前提是得保证数据库里的属性名和类的一样
+      - [ ] 36行和25行的属性名需要一样吗？
+    - 复习04 展开运算符
+      - ①可以展开数组 在函数中使用
+        - console.log('@',numbers)
+          - 表示@是第一个参数 numbers是第二个 是个数组
+          - ...numbers接收的是一个数组 加到numbers里
+        - 数组的reduce方法 求和
+      - ②how about展开对象
+        - console.log(...person)
+          - 不能把展开运算符应用于对象{} 报错：对象类型没有iterator接口
+          - 引用关系的传递 浅拷贝 let person2 = person 不是复制
+        - console.log({...person}) 一种语法
+          - 复制一个对象 构造字面量对象 克隆对象
+          - 参考：MDN JS 表达式和运算符 展开语法
+        - React下的{...person}
+          - React里的{}是分隔符 表示里面你要写一个JS表达式了 所以实际上写的JS代码只有...p
+          - 引入了html和babel可以允许用展开运算符去开展对象 
+          - 原生里不行 要带{} 这里的{}是一个语法 克隆对象
+          - 仅仅适用于标签属性传递 console.log(...person)不可以展开对象
+      - ③复制对象同时修改&追加属性
+        - {...person,name:'jack',address:"地球"}
+        - 复习：setState的更新也是合并，不是覆盖
+  - 对props进行限制
+    - value都是字符串 不带引号的数字会语法错误
+      - {19} 表示JS代码 可以传number类型
+    - class需要对传递的标签1属性类型2必不必要传3不传时的默认值进行限制
+    - [ ] propTypes是不是类似于props的DTO
+      - 写法① 可以写在class外侧 Person.propTypes = 定义
+    - React有个内置的对象PropTypes 版本15之前 React.PropTypes.string
+      - 16之后独立成了一个js包 引入prop-types后直接使用
+      - 组件标签属性限制 全局有了PropTypes PropTypes.string
+    - age+1 不传age undefined+1 会显示NaN
+    - props也可以是一个方法function
+      - PropTypes.后的类型是小写开头的（一个代号） 真正的内置的对象类型是大写开头的（String, Number）
+      - 如果要限制某个props为方法 写func 不然和真正的方法function字符冲突
+      - 然后传speak={speak}
+  - props的简写方式
+    - 修改this.props.xxx会报错
+    - 复习01 类
+      - 给类自身加一个属性
+        - static demo = 100
+      - 给类的实例对象加一个属性
+        - wheel = 4
+    - Person.propTypes/defaultProps是给类自身加了一个属性
+      - 写法② 加上static写在class里 static propTypes = 定义
+  - 类式组件中的constructor和props
+    - 复习
+      - 初始化状态
+        - 构造器中this.state =
+        - 不写构造器 直接state = {}定义
+      - 绑定事件
+        - 构造器中this.changeWeather = this.changeWeather.bind(this)
+        - 不写构造器 赋值语句+箭头函数
+    - 类中constructor可省略 一般不写
+    - 只要写constructor必定要写super
+    - 只要写constructor
+      - 接/不接props 不传props
+        - 不可在类中通过实例（this）访问props undefined
+      - 接props 给super传props
+        - 可在constructor中使用this.props
+        - →几乎不需要 真想用的话写props一样的
+    - csl 第一个引数 标识符
+  - 函数式组件使用props
+    - function组件没有实例（this），所以不能使用this.state this.props refs
+    - but函数能接受参数 可以有props
+      - 标签属性可以用props接到 一个对象
+      - 可以用props
+    - 可以给函数组件加上属性来限制props
+      - Person（一个函数）.propTypes 写在外侧
+  - 总结props
+    - props收集一个对象
+    - protoType是显示原型属性的
+- 08 refs
+  - 1字符串形式的ref（deprecated 因为效率低）
+    - <input placeholder="输入栏里的提示文字"/> 
+    - 标签属性ref="input1"
+      - props不收集ref= refs收集 可收集多组
+      - key是ref value是当前所处的节点
+      - this.refs.input1就是该标签的真实DOM
+    - [x] 23行和28行 {input1} 取refs里的input1？ es6解构赋值
+      - 这里使用了对象解构赋值，从this.refs对象中提取名为input的属性，并将其赋值给变量input。
+      - 解构赋值的一般语法是const { 属性名 } = 对象，这样会将对象的对应属性的值赋给指定的变量。所以这段代码中的赋值操作就是将this.refs对象的input属性的值赋给了input变量。
+    - 失去焦点 原生html是onblur React中封装成onBlur
+  - 2回调形式的ref
+    - ref后写一个函数 React会调用 并且把当前节点传参 把他挂到实例上是最多的做法
+      - `c=>this.xxxNode = c`传出节点
+      - `this.xxxNode.value`取出值
+    - [ ] 生命周期钩子？
+    - 回调函数三个特点1你定义的函数2你没调用3最终执行了
+    - ref={某某函数} 该函数会被执行 
+      - {(a)=>{console.log(a);}} 参数是当前所处节点
+      - {(c)=>{this.input1 = c;}} 把当前节点放在当前实例中 挂在实例的input1上
+        - 用const {input1} = this就可以取到c了
+        - this是箭头函数外侧render的this c是currentNode
+      - {c => this.input1 = c;}
+        - 箭头函数的左侧参数只有一个的时候可以省略()
+        - 右侧只有一句函数体可以省略{}
+  - 回调ref中调用次数的问题
+    - 内联函数 定义在标签里的函数
+    - 第一次render 画面上显示组件 执行一次
+    - 内联函数在更新组件时回调函数执行两次 第一次ref返回null清空函数 第二次才传当前节点
+      - 更新是state变化 驱动画面显示变化 执行回调只是交互
+    - 回避策 和class的绑定函数 一般没必要
+      - ref传回执行函数 this.saveInput 然后在class定义该函数 就不会重复执行了（よくわかんないけど放置）
+    - jsx注释写法
+      - /**/ <!-- -->是js语法
+      - jsx中加个{} 表示里面要写js表达式了
+  - 3createRef的使用 最推荐
+    - 返回一个容器 ref把该节点（Element、DOM）存储进容器 默认起名current
+  - 总结ref
+- 09 react中的事件处理
+  - 发生事件和操作的元素是同一个时可以省略ref={this.myRef}
+  - 回调（onXxx右侧）的时候其实把event传回去了（onXxx右侧） 发生事件的事件源 明示用event.target可以取出节点（这个可以不写接event参数）
+- 10 收集表单数据
+  - 非受控组件
+    - which means输入类DOM的值 现用现取 要写很多ref
+    - 不指定请求方式 form发出请求默认get 带着query参数（?后的参数）
+    - button默认的type值是submit form标签中只有一个按钮的时候可以submit
+    - form有个原生事件onsubmit
+    - Ajax 可以页面无刷新获取数据
+      - 可以只用form提示数据 让页面不刷新 再写一个Ajax传数据到后台
+    - form不写action=也会刷新页面
+    - 原生可以阻止默认事件 有阻止表单提交的方法
+  - 受控组件
+    - 随着输入维护状态
+    - 输入类的DOM都能绑定onchange属性 可以回调
+      - Vue里的双向绑定 React里没有
+    - input onChange 每次内容更改都会调用
+    - 如果要使用state 最好初始化
+- 11 高阶函数 函数柯里化
+  - 复习：指定回调函数不能写小括号 like
+    - onChange={this.saveFormData('username')}
+    - 即使回调函数明示要接参数event/e（只有可能是()或(e)）
+  - class内函数（即使没有显式地写function关键字也算函数）可以没有return 返回值为undefined 不会报错（Java没有undefined 在写compile阶段就会报错）
+  - 如果onChange接一个非undefined的东西 比如return一个函数 那也可以 which means onChange后接
+    - this.saveFormData
+    - () => {}
+    - 是同一个效果 which means
+      - () => {}里可以用event？YES！
+  - 属性名是字符串
+    - setState({'dataType':event.target.value}) 标准写法
+    - setState({dataType:event.target.value}) 简写
+    - 相当于传一个叫dataType的state
+    - →属性名是变量要加[]
+    - 复习05 对象相关的知识
+      - obj[a] a是变量 用来给obj加属性名和值
+  - 一些JS豆知识fromGPT
+    - [dataType] 不是数组，而是一种使用计算属性名（Computed Property Names）的 JavaScript 语法。这个语法允许你在对象字面量中使用表达式来定义属性名。可以让你根据变量的值动态地创建对象的属性
+    - 对象字面量的基本语法是使用花括号 {} 来包裹一组属性和值的键值对 是实例对象
+    - const（常量）类似于Java中的final const {}中属性值的内容可以被更改 但是赋值语句只能用一次 不能指向其他对象 （可以计算 不能赋值）
+      - final都禁止
+    - JS中数组的元素可以是基本数据类型也可以是引用数据类型
+  - 复习06演示函数的柯里化
+    - apply(1).apply(2).apply(3)
+    - apply(1)(2)(3)
+      - 参数和返回值都是函数
+    - 柯里化在不能直接传某个参数的时候好用 在这里是因为React只给你传event不传其它参数 也不能自己加传一个event
+      - 适用于准备可以接函数的地方 在这里是onChange
+  - 不用柯里化的写法
+- 12 组件的生命周期
+  - 引出生命周期
+    - 挂载 mount 就一次？
+    - 卸载 unmount
+    - 循环定时器 setInterval 每隔一段时间执行操作 单位毫秒
+    - this.setState({opacity:opacity})
+      - 属性名和代入变量同名可以省略写法
+    - opacity -= 0.1 有可能直接到负数 所以判断条件不写===0写<=0
+    - 每次setState都会调用一次render 所以setState不能写在render里
+    - 要挂载完后开启定时器
+      - 挂载完后自动调用的一个方法 通过实例对象调用 和render一样
+    - 组件卸载时 定时器需要清除
+  - react生命周期（旧） 
+    - 组件挂载流程
+      - 初始化状态写在constructor外面或里面都可以
+    - 组件更新流程（执行setState）
+      - shouldComponentUpdate 阀门
+        - false的话不更新
+        - 自己写的话要有返回值 不写return就是undefined
+    - 组件更新流程（执行forceUpdate）
+    - 组件更新流程（父组件render）
+      - A组件中用了一个B组件就形成一个父子关系 A包裹了B
+      - 返回值里面加一个`<B/>`
+      - 标签属性进入B的props
+      - 第一次挂载父组件render的时候不执行componentWillReceiveProps
+      - componentWillReceiveProps可以接props
+      - props有更新B就重新render
+    - 总结生命周期（旧）
+  - react生命周期（新）
+    - BootCDN.cn 前端常用JS库下载
+    - 3个will的钩子不建议使用 除了WIllUnmount
+      - componentWillMount
+      - componentWillReceiveProps
+      - componentWillUpdate
+      - 废弃警告 新版本要加UNSAFE_才能用 之后删除
+  - getDerivedStateFromProps
+    - 1要给类加方法（不是实例） 要加static
+    - 2一定要返回状态Obj或者null
+      - 给一个{状态名:xx} state会被更改 
+    - 能收到props (props)
+      - 可以根据props更改state
+    - state在任何时候（挂载更新）都取决于props时用  
+      - return的state会覆盖 写死了就改不了了
+    - 能收到state (props,state)
+  - getSnapshotBeforeUpdate
+    - 1一定要返回snapshot或者null
+    - 传给componentDidUpdate
+      - 接prevProps和prevState
+      - 第三参数是snapshotValue
+  - getSnapshotBeforeUpdate举例
+    - class=CSS样式的类名 可以接多个 用空格分隔
+    - list.scrollTop 显示的起始高度
+    - list.scrollHeight 返回内容区的高度
+    - getElementsByClassName取得的是一个HTMLCollection类似于数组 加上[0]获得第一个元素
+    - map(){} 遍历
+    - didUpdate之间 画面已经更新 然后修改该list找的scrollTop
+      - 可能会出现瞬间鬼畜 fromGPT
+      ```
+      getSnapshotBeforeUpdate(){
+        return this.refs.list.scrollHeight
+      }
+      componentDidUpdate(preProps,preState,height){
+        this.refs.list.scrollTop += this.refs.list.scrollHeight - height
+      }
+      ```
+      - 一直给起始高度加上刚才更新前后的总高度差值
+      - 因为是快照所以传到componentDidUpdate的height还是更新前的那个
+  - 总结生命周期（新）
+- 13 DOM的Diffing算法
+  - 验证Diffing算法
+    - Diffing means 比较新旧虚拟DOM数据后映射新的真实DOM
+    - date.toTimeString()
+    - 变化的最小粒度是一个标签/节点 不一定是那个最大的标签 而不是{}中的值
+    - 标签里包含的其他标签也会对比
+  - key的作用
+    - 复习：遍历的时候需要指定不同的key
+    - diff先比较key再比较内容
+    - 1用index（索引值）作key 2数据往前面加 会全部重新渲染影响效率
+    - 页面里有输入类节点时用index作key会乱套
+      - 节点中有一部分输入类内容如果和原同key节点内容相同 真实DOM将会被复用
+      - [ ] 如果有submit的话是提出到哪里去了？内外节点会不对应吗？
+    - index代表元素在数组中的顺序 id对应每个元素

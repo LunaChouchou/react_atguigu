@@ -1,0 +1,189 @@
+## React应用（基于React手脚架）
+- 01 手脚架自带文件
+  - 初始化react脚手架
+    - webpack
+      - npm yarn 包 包管理器
+    - 脚手架库 create-react-app
+      - 通过这个库去创建react的手脚架 全局安装
+      - `npm install -g create-react-app`
+      - `npm i create-react-app -g`
+    - cmd cls 清空屏幕
+    - create-react-app react_staging（项目名）
+      - 创建react项目 安装依赖
+      - yarn start 开启开发者服务器
+      - yarn build 写完的项目最终打包 生成静态文件
+        - 交给后端部署
+      - yarn test 几乎不用这种单独的测试库
+      - yarn eject 
+        - react写好了webpack的配置文件 默认把所有文件隐藏
+        - webpack.config.js等等
+        - 暴露webpack所有配置文件 无法撤销
+      - 安装了npm/yarn 就可以用相应的start
+    - 使用yarn和npm都会有package.json文件
+      - clone后用npm i或yarn下载所有依赖
+  - 脚手架文件介绍
+    - localhost和局域网位置IP 3000端口
+    - debug.log用vscode打开时生成的日志文件
+    - 整个项目只有一个html文件
+      - 其他功能拆成多个组件
+      - SPA应用 单页面应用 single page application
+    - <link rel=>引入图标
+      - 一般用link引入的东西都是icon、stylesheet
+    - 页签背景色兼容性不太好 可以和banner搭配做效果
+    - meta description 搜索引擎收录网站时用到的标签
+    - <link rel="manifest"> 应用加壳
+      - 给手机页面加一个壳 生成一个.apk web变成安卓手机应用
+      - PCweb 手机web
+      - manifest.json 手机应用的配置文件 名字 图标 访问设备权限 是否混入百度地图API
+    - div id root 容器 组件都往这里面放
+    - robots.txt 爬虫规则文件 规定什么可以爬什么不可以
+  - 手脚架文件介绍_src
+    - App.js 组件App
+    - App.css App用的样式
+    - ES6模块化语法 export default App; モジュール化
+    - index.html里的root 组件放进去 ReactDOM.render只放一个组件
+      - 组件里可以有子组件
+    - App.test.js 用来测试App的组件 几乎不用
+    - [ ] src/index.css 通用性的样式 所有html和组件.js自动引入？
+      - 也可以移动+通过link形式引入
+      - src/index.js 入口文件 webpack要用
+        - 默认import './index.css'
+        - css文件改位置之后把引入删掉 不然会报错
+        - 有时候要重启app才会反应
+      - public/index.html
+      - [x] 同一位置同名自动使用？ NO 要import
+    - index.js 入口文件里引入
+      - 库
+        - import react, reactdom
+      - 样式
+        - import index.css
+      - 组件
+        - import App
+      - 渲染app
+        - src/index.js可以找到public/index.html里的root
+      - render里的App要被React.ScrictMode包裹 和ES5严格模式无关
+        - ref="demo" 之类的不能写 检查代码
+    - logo.svg 图片
+      - App.js中引入了
+      - 一切皆模块
+    - reportWebVital.js 记录页面性能文件
+      - web-vitals库 页面性能检测
+    - setupTests.js 应用整体测试 组件、单元测试也可
+      - jest-dom库
+    - babel被集成到webpack里了
+    - 执行顺序
+      - src/index.js 引入 render 渲染App 放到root
+      - 去public/index.html 找root
+      - App.js 显示
+      - 引入了App.css样式
+- 02 hello_react
+  - 一个简单的Hello组件
+    - package.json包的说明文件
+    - yarn.lock yarn的缓存文件 下次下载yarn包时更快
+    - public
+      - index.html
+      - favicon.ico
+    - src
+      - App.js
+      - index.js
+    - 借助webpack-dev-server开的 ip:port
+    - ES6模块化语法 用默认暴露形式模块名可以改 import xxxx
+    - 在react脚手架中引入App.js/jxs .js/jsx可以省略
+    - export default App 默认暴露
+      - 分别暴露？
+    - 按住ctrl点URL可以打开网页
+    - React.Component省略成Component
+      - 1const {Component} = React
+      - 2import React,{Component} from 'react'
+        - 不属于引入时解构赋值 是ES6的一种引入方式 分别暴露和统一暴露的东西
+        - 因为react使用了多种暴露方式 包括了Component的分别暴露（对吧？）
+      - export class Component {} 分别暴露Component 不能export Component
+    - export default class App .. 创建并暴露App
+    - App组件是壳子 要return子组件
+    - Hello/ 按Tab会变成标签
+    - 脚手架里用import引入样式 不是link
+    - components里新建组件文件夹
+      - `import Hello from './components/Hello'`
+      - 在引入组件文件里的组件时path可以省略/index.jsx
+      - index.js不是组件 仅仅是一个有业务逻辑的js文件
+      - 组件的话 1首字母大写、2js改成jxs
+    - className="样式名"
+  - 样式的模块化
+    - 子组件的同名样式文件index.css相同 如果有人样式名又一样会冲突
+      - 后引入的样式会覆盖
+    - 非必须
+    - less文件可以这样写
+        - .hello{.title{}} 在外包裹一层
+    - index.module.css 文件名加module
+      - import hello from './index.module.css' 拿一个变量接一下
+      - className={hello.title} 
+  - vscode中react插件安装
+    - rcc 快速输入代码模板 类组件
+    - rfc 函数组件
+  - 3.1.4 组件化编码流程（通用）
+- 03 TodoList案例
+  - TodoList案例_静态组件
+    - id可能绑定了样式 删除有id的标签时需要检查
+    - 引入包的原则 顺序 第三方→自己的包→样式
+    - 流程
+      - 先在App.js App.css里写静态结构 再拆分成组件
+      - 找到全局和局部的样式 分到App.css和组件.css里
+  - TodoList案例_动态初始化列表
+    - 兄弟组件间不能数据传输（目前知识水平）
+    - 父组件可以给子组件传数据 <List a={1}/>
+    - {...对象} 批量传递
+    - checked={true} 不可修改
+      - 以后想改需要写onChecked方法
+      - defaultChecked 可修改
+        - 会产生bug（稍后修正）
+  - TodoList案例_添加todo
+    - onKeyUp 按完键盘
+    - onKeydown 刚按下键盘
+    - event.keyCode 刚按了什么键的一个代号
+    - 父组件给子组件传参数
+      - App(state)传给子组件List(props)
+    - 子组件给父组件传参数
+      - 父给子通过props传一个函数
+      - 子调一下这个函数就能把数据传给父
+        - 因为这是父组件的函数
+        - 复习：传函数的时候需要 1箭头函数赋值 2传的时候加this.
+      - uuid 一个规则 生成不重复ID
+      - uuid，nanoid用来生成不重复id的库 nanoid更小
+  - TodoList案例_鼠标移入效果
+    - onMouseLeave 鼠标移出
+    - onMouseEnter 鼠标移入
+    - 每个<li>由一个Item组件生成 所以各自有自己的mouse、flag 不会影响其他行
+  - TodoList案例_添加一个todo
+    - onChange
+    - type="checkbox" event.target.value不能用 都是on 要换checked 返回选中状况
+    - 复习：b:3会覆盖上一个b:2
+      - let obj = {a:1,b:2}
+      - let obj2 = {...obj,b:3}
+    - 复习：done:done 可以简写成done 对象属性名:带入属性值（的名字done 内容是t/f）
+      - if(todoObj.id === id) return {...todoObj,done}
+    - 复习：{...todos}展开传给子组件 子可以用this.props取出来展开后的id,name,done
+  - TodoList案例_对props进行限制
+    - PropTypes手脚架没有给下载 需要自己下载
+    - yarn add prop-types
+    - 对传递的props进行类型和必要性限制
+      - Header需要addTodo List需要todos和updateTodo 
+      - [ ] 为啥不给Item加需要todo和updateTodo之类的
+  - TodoList案例_删除一个todo
+    - delete是一个关键字 用于删除对象中的指定属性
+      - delete obj.a 
+    - filter 符合条件的加入 不符合条件的删除
+    - confirm方法 用于确认操作 返回true/false
+      - window.confirm windows身上的confirm
+  - TodoList案例_实现底部功能
+    - 数组身上的reduce方法用于统计个数 条件统计、条件求和、筛选最值
+    - 调用reduce时可以传两个参数 回调，统计初始值（0）
+      - 调回调的时候可以传两个值 pre，current
+        - pre上次返回值
+        - current第一次调用时返回值
+    - 箭头函数内容如果只有一行可以省略return {}
+    - checkbox写了checked就一定要写onChange不然就是写死的 不能修改
+      - 用defaultChecked会导致只有在初次显示时起作用
+      - defaultChecked=右边的内容发生变化也不会起效
+      - 所以写个checked和onChange就挺好
+  - TodoList案例_总结
+    - 

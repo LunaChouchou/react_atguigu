@@ -1,0 +1,57 @@
+- 01 React简介
+  - ES5和ES6的区别：
+    - https://qiita.com/rifutan/items/a55f132d4dae7e2f1941
+  - react.development.js 核心库 全局有了React
+    - react-dom.development.js 扩展库 全局有了ReactDOM
+    - 需要先引入核心库再引入扩展库
+  - tab + ! 初始化html
+    - <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      - 移动端适配用
+  - test/babel
+    - 表明下面写的是jsx，并且由babel进行翻译 jsx→js
+  - js下的虚拟dom用单引号表示字符串，jsx不能写引号
+  - 引入jQuery后多了jQuery和$
+  - render 渲染
+  - '#test' 选择器 React不支持
+  - favicon.icon只在第一次请求 发现没有之后就不请求了
+  - 脚手架，开发者工具？
+  - render只用一句 写两句会被覆盖
+- 02 虚拟DOM
+  - 用jsx：加个id标签属性title？？？有啥区别
+    - id标签 生成的dom会有一个id标签
+    - 比较长的时候用()括起来 里面可以分行
+  - 用js：
+    - document.createElement 创建真实DOM节点
+    - React.createElement 创建虚拟DOM
+    - span标签
+  - 输入did
+    - →document.getElementById
+- 03 jxs语法规则
+  - js内置的json对象
+    - parse方法
+      - json字符串→js的数组和对象
+    - json.stringfy
+      - js数组对象→json字符串
+  - ES6里的类是class，为了有区分所以用className
+  - 虚拟DOM里可以用css样式，不用{}
+    - 不能直接应用style="xxx" 要用{{}}
+      - 外{}表示这是js表达式
+      - 内{}js里的对象（而非函数，数组）
+        - key要用小驼峰
+        - value要用''表示字符串 不然会去寻找变量
+- 04 小练习
+  - 表达式&语句
+    - {}里写js表达式
+      - 可以接一个const x = 的东西，有返回值的
+      - 调用函数可，定义函数可
+      - console.log(1)也可
+      - 可以返回标签
+    - 不能写js语句（代码）
+  - {data}读变量
+    - data读文字列
+    - ``<li>{item}</li>`` 标签
+    - item必须有唯一的key属性，but用index不太好
+      - [ ] 使用map渲染列表的时候？因为生成多个标签？
+    - 不能用对象Object作为React中的节点使用，只能用数组
+      - React只接文字列
+    - [x] 节点とは？

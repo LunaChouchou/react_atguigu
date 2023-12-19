@@ -1,0 +1,168 @@
+# redux
+- redux简介
+  - 课件
+  - 复杂的状态的交互
+  - vue用vuex、pinia
+  - 共用的数据存在redux里 集中式状态管理
+  - like localstorage 全局参数 缓存
+- redux工作流程
+  - 课件
+  - 全家桶 原理图
+  - **Action Creators**
+    - 可以不写 自己做一个Object action
+  - **action** 动作对象 Object
+    - 动作类型 type
+      - 属性是字符串
+    - 动作数据 data
+  - **dispatch** 分发 函数
+  - **Store**只有一个 其他的可以有多个
+  - **Reducers** 加工状态 
+    - 第一次是初始化状态
+      - previousState是undefined
+      - type是@@init@@
+      - data是空的
+    - 纯函数
+- 纯react版
+  - async 异步
+  - `create-react-app redux_test` 创建pjt
+  - select value里是一个字符串 no数字
+    - value*1就变成数字了
+- redux精简版（只实现了加和减—）
+  - 每个组件对应一个Reducer
+    - 没有用到API 自定义function
+  - 先写Store再写xxx_reducer
+  - `yarn add redux`
+    - 如果项目是第一次用yarn的话会给你新建一个yarn.lock 版本也更新在里面了
+  - `yarn add @reduxjs/toolkit`
+  - 豆知识from GPT：
+    - 默认暴露/导入  
+      - `export default configureStore(countReducer)`
+      - `import countReducer from './count_reduecer'`
+      - 因为只暴露1个所以可以不起名/不同名
+    - 命名暴露/导入
+      - `export const countReducer = (state, action) => `
+      - `import { countReducer } from './count_reduecer'`
+  - reducer是一个纯函数 不写判断
+  - `function countReduecer(preState=initState,action)`
+    - 形参的默认值 如果没有传或者传的undefined时的默认值
+  - **store.getState()** 得到状态
+    - 第一次调用store的时候初始化
+      - undefined, {type:@@init@@} 没有传data
+  - **store.dispatch** 告诉store我要改数据了
+  - react的setState可以更改状态+调一次render
+    - redux只更改状态 不调render 需要触发render
+  - **store.subscribe** 订阅监测redux状态变化
+    - 在钩子里调this.setState({})重新渲染画面
+    - 也可以在index.js里重新渲染 App重新diffing后渲染
+- redux完整版
+  - README.md
+  - 每个组件对应一个action creater
+    - 没有用到API 自定义action对象
+  - `const createIncrementAction = data => {type:'increment',data}`
+    - 右边的{}可能被认为是函数内容 而不是return一个对象
+    - 可以在对象外面加一个()
+  - 一般还会定义一个常量模块 constant.js
+- 异步action版
+  - action的类型
+    - Object 同步action
+    - function 异步action
+      - （使用中间件后）可以接到参数dispatch(是个函数)
+      - （from弹幕）store的dispatch方法会判断传入值是函数还是对象，如果是函数，那就给这个函数传参数，参数是store的dispatch方法并且执行这个函数
+        - remember that参数可以是函数 既然这里可以接到store的dispatch函数
+        - so that可以不用引入store写store.dispatch了
+  - 让action去完成等待500ms，而不是组件
+    - 不是必须的
+  - function是一个特殊的Object对象 有别于plain Object
+  - store只认Object形式的action
+    - 需要下载中间件 redux-thunk库
+  - 异步action可能是一个定时器orAjax回调 再dispatch一个真正的同步action
+- 对react-redux的理解
+  - react-redux是fb出品的react插件库
+  - react-redux模型图.png
+    - 容器组件
+    - UI组件
+      - 不能写redux相关代码 制作呈现
+    - redux
+- 连接容器组件与UI组件
+  - 容器组件和UI组件
+    - 容器组件要用react-redux创建
+    - yarn add react-redux
+  - store要通过最上层组件的props传入
+- react-redux基本使用
+  - Count container是CountUI的父组件
+  - 第一次调用connect的时候应该传递2个参数 都是函数 connect(a,b)
+    - 把你想传递的东西作为函数返回值 然后给connect传这个函数
+    - 得是个对象 因为props是key=value
+  - UI-container（App）-redux 状态传递
+    - App父->container子
+      - 通过标签传props
+    - container父->UI子
+      - 通过给connect传函数-props取出
+    - container-redux
+      - store API
+  - store已经传给container了
+    - store里的state也已经给了connect的a函数
+    - store的dispatch也给了b函数 直接用
+  - 人话版
+    - 在App.js里给container传好了store
+    - 所以container里可以直接拿到store里有的state和dispatch
+    - state（数据）用a函数拿 dispatch（操作）用b函数拿
+    - ab传给UI组件用
+    - UI组件的props里就可以拿到state、呼出操作
+- 优化1_简写mapDispatch
+  - README.md总结
+  - 简写：mapDispatchToProps也可以传对象 函数名:action react-redux自动给你dispatch
+    - 而且可以不写参数
+- 优化2_Provider组件的使用
+  - 用react-redux之后connect的容器组件可以自动监测store的变化 不需要在App.js里写subscribe了
+  - Provider可以给所有容器组件传store 不需要在App.js里一个一个给了
+    - 在index.js（更上层）里渲染用Provider包着的App（上层）
+- 优化3_整合UI组件与容器组件
+  - 把UI和容器组件合成一个文件
+  - README.md
+- 数据共享_编写Person组件
+- 数据共享_编写Person组件的reducer
+- 数据共享_完成数据共享
+  - redux帮我们保存的数据总的是一个对象{}
+  - combineReducers() 要传入那个redux帮我们保存的总对象
+    - 只有1个reducer的时候取出state直接就是要的那1个数据
+    - 有n个reducer的时候state就是一个对象了 所以要state.xxx来取出
+  - connect()的a里面传给你的state是redux帮你保存的总状态对象（和组件自己的state无关）
+- 纯函数
+  - README.md
+  - push, unshift 编辑数组
+    - preState.unshift(data) 往前加一个数据
+      - return preState
+      - react做了一个判断 如果返回值和preState是同一的就不做画面更新 //sb吧
+      - 底层做了一个浅比较 地址值相同
+      - 所以用运算展开符 每次都做一个新的数组返回
+    - push返回的是length
+    - 很少用push和unshift 而且也不是纯函数
+  - 纯函数
+    - 课件
+- redux开发者工具
+  - 安装浏览器插件
+  - 安装库 yarn add redux-devtools-extension
+  - 在store中引入composeWithDevTools
+    - 不知为啥用了会error 不需要在文件里配置了
+  - Inspector左列@@INIT 第一次action时的type
+    - 可以回到每一步的状态（除了INIT） Jump（回退）/Skip（省略这次action）
+  - 右列 State-Tree用的比较多
+  - 可以回放、手写代码测试
+- 最终版
+  - reducers/index.js汇总reducer
+  - 最好还是看数据共享版便于理解
+  - README.md
+- 项目打包运行
+  - npm start是部署在开发者服务器
+  - ①npm run build 生成静态文件
+    - 生成一个build文件夹 包含js和html
+  - ②部署在服务器上
+    - 1 Node.js或java搭一个服务器 部署上去
+      - node express也可
+    - 2 serve库
+      - 以指定文件夹快速开启服务器
+      - npm i serve -g 全局安装！
+      - 在根目录build下打serve命令 开启服务器
+        - serve 根目录的相对path
+      - react开发者工具变成正常颜色

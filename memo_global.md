@@ -1,0 +1,33 @@
+- 如何修改历史comment from GPT
+  - git rebase -i HEAD~N
+    - 上一个：git commit --amend -m "新的提交注释"
+  - 其中 N 是您希望重新编辑的最近提交的数量（包括当前提交）
+  - 对于您想要更改注释的提交，在该提交行的开头将 pick 更改为 reword
+  - Start rebase
+  - 修改第一行comment 点勾保存
+  - 注意，在分支上修改创建分支以前的commit历史记录时，会用新的哈希值创建commit记录，这会导致分支和master的commit的哈希值不同，导致分支和master的graph分道扬镳，所以需要先在master checkout，再更改记录
+- div#root 可以输入id为root的div标签
+- 安装项目里的依赖
+  - npm install/npm i
+  - yarn
+  - 先执行一次npm i 如果依赖有问题再执行一次yarn
+    - 看起来用add时用哪个package.json和yarn.lock都会被更新
+  - 如果想删除没有写在依赖配置里的库 需要手动删除node_modules下全部文件后重新安装
+  - 删除包
+    - npm uninstall redux-devtools-extension
+    - yarn remove 包名
+  - 只删除包不删除依赖
+    - npm uninstall --save-dev 包名
+    - npm uninstall -D 包名
+    - yarn remove --dev 包名
+    - yarn remove -D 包名
+- 发布本地仓库
+  - 在github网页new repository
+  - git remote add origin https://github.com/你的用户名/你的仓库名.git
+  - git push -u origin 分支名
+    - 所有分支 git push --all origin
+  - master和main类似 主分支名
+  - origin 远程仓库简称 也可以写作origin/分支名
+- 快捷键
+  - shift+alt+a /**/快速输入
+  - tab + ! 初始化html

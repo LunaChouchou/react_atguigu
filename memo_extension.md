@@ -1,0 +1,171 @@
+# setState
+- 课件/React扩展.md
+- setState
+  - 对象式setState
+    - stateChange, [callback]
+      - [可选参数] 回调函数
+    - react在异步更新
+      - setState是同步方法 在主线程上运行
+      - 引起react后续更新状态的动作是异步的 所以下一行读state是更新前的state
+    - callback在改完状态、render后才调用 可以看最新值
+  - 函数式setState
+    - updater, [callback]
+    - updater可以接state,[props]
+- lazyLoad
+  - 路由组件的懒加载最多
+  - 安装react-router-dom
+  - 所有路由组件在第一次打开页面时会全部加载
+    - F12 Network 选Disable cache 清空页面 
+    - 第一次加载时全部在bundle.js, xxx.chunk.js里了
+    - 再点组件 显示不会有新的网络请求
+  - react的lazy函数
+    - 把组件全部import的话就不会懒加载了 一上来就会全部引进
+      - 用定义变量的形式引入 const About =
+      - 要给lazy传一个函数 lazy(() => {})
+      - import也支持函数调用 lazy(() => import('./About'))
+    - 这样点了Home再去加载Home 随用随请求
+  - 必须要写内置组件Suspense
+    - 需要用Suspense的fallback属性给等待加载时看的东西
+    - 用Suspense包住注册路由的部分
+    - 可以给fallback传个Loading组件
+      - fallback组件需要在render时已经就位 所以Loading不能lazy
+  - Network可以调整浏览器网速
+- stateHook
+  - react 16.8前 函数式组件不能用state,生命周期钩子 除了props
+    - function没有this 不能用this.state this.钩子
+  - React.useState()
+    - 使用state
+    - 返回一个数组 包含2个元素
+      - 状态
+      - 更新状态的方法
+        - 写新数据 newState
+        - 写函数 接state反newState
+    - 豆知识：可以在函数内定义函数
+    - 豆知识：[a,b] 数组的解构赋值
+  - Demo函数 调用n+1次
+    - 每次页面刷新都会跑一次Demo()
+    - 第一次调用的时候缓存初始state 第二次之后调用不会用初始值覆盖state
+- EffectHook 副作用操作
+  - React.useEffect()
+    - 豆知识：函数里不能定义对象方法 要定义函数
+      - xxx = (){}, onClick={this.xxx} ×
+      - funcion xxx(){}, onClick={xxx} √
+    - 用useEffect 可以使用生命周期钩子
+    - 调用的时候可以传入2个参数
+      - 函数
+        - 返回一个函数，就相当于**willUnmount**(){该函数}
+      - 数组
+        - 不写=监测所有人 组件挂载和更新时执行
+        - 空数组=不监测 相当于**didMount**
+        - [count]=监测count 可以相当于**didUpdate**
+          - 内容发生变化时执行 不变化不执行
+    - React18不清除定时器也不会报错
+- RefHook
+  - const refContainer = React.useRef()
+    - 构建一个容器 保存节点 专人专用 类似于React.createRef
+- Fragment
+  - <Fragment></Fragment>
+    - return必须包在1个标签里 有多余<div>
+    - <Fragment>编译的时候会被丢掉 不渲染真实DOM
+    - 要import from 'react'
+  - <></>也可以
+  - 区别
+    - 遍历时 Fragment可以指定一个key 其他的不行 编译时只保留key
+    - 空标签不可以传数据
+- Context
+  - 2级以上亲自关系传输（父子之间用props）
+  - 组件里的this是组件的实例对象
+    - context
+    - props
+    - refs
+    - state
+  - 使用 方法1 类组件用
+    - ①创建Context容器对象 **createContext** 事件总线？
+      - 在ABC组件都能访问到的地方
+      - 多个数据也只用一个
+    - ②传递
+      - Context身上的**Provider**属性包住子组件 给Provider传数据 以下的子孙都可以收到了
+      - 一定要写**value=** 不能改名
+        - value={username}传字符串
+        - value={{username:username,age:age}}传对象（多个字符串）
+      - react组件标签需要是大写字母开头的 所以MyContext是大写开头
+    - ③接收
+      - 声明接收 provider inject
+        - **static contextType = MyContext** 拿到MyContext
+      - 使用 **this.context**
+  - 方法2 函数式组件类组件都可
+    - ①创建Context容器对象 **createContext**
+    - ②传递 **Provider**
+    - ③接收 Context身上的**Consumer** 在标签里面写函数{}
+      - {}里面都是js表达式 返回<标签>或`模板字符串`
+      - 函数会收到**参数value** 数据值 传的是对象的话收的也是对象
+- PureComponent
+  - setState({}) 不修改state 也会调用render
+  - 不给子组件传数据 子组件不用父组件数据 传的数据不变 子组件也会render（生不生成新真实DOM不一定）
+    - 此时shouldComponentUpdate永远为true
+  - 可以用手写shouldComponentUpdate优化
+    - props和state没变化的话其实可以不render
+    - 可以接参数 nextProps,nextState
+    - 在父组件里写 判断nextState.xxx===this.state.xxx 返回true的话 return后面的东西都会render 包括子组件 不管有没有传数据、使用数据、前后数据是否相同（包括set{}和更新一个一样的）
+    - 在子组件里写 判断nextProps.xxx===this.props.xxx 返回true的话 return后面的东西都会render 不管有没有传数据、使用数据、前后数据是否相同（包括set{}和更新一个一样的）
+  - 实际操作中使用PureComponent 阀门内容自动写好了
+    - 没有传数据、使用数据、前后数据相同时 不render
+    - 有一个问题
+      - 正确写法
+          ```js
+          this.setState({carName:'迈巴赫'}) //建立了一个新对象
+          ```
+      - 错误写法
+          ```js
+          const obj = this.state //引用地址的传递
+          obj.carName= '迈巴赫' //obj是state原对象
+          console.log(obj === this.state); //会返回true
+          this.setState(obj) //地址没变，react认为state没变，阀门关闭
+          ```
+      - obj不能和原来的state对象有关
+      - 所以不要用数组的push, unshift 数组地址未变
+- renderProps
+  - Parent父 AB子
+  - children props 
+    - `<A>标签体</A>` //A是子组件
+      - ↑不会显示标签体
+      - 标签体是特殊的标签属性 属性名是children
+      - this.props.children取出标签体
+      ```js
+      <A>
+        <B/> //B是子组件
+      </A>
+      ```
+        - ↑不能显示B组件
+        - this.props.children取出B 会调用B的render 不能传数据
+  - render props 在Parent决定A和B的父子关系
+    - `<A render={()=><B/>}/>` render属性 返回一个函数 函数返回值是组件
+      - 给B传数据的函数 `(name)=><B name={name}/>`
+    - A使用的时候写`{this.props.render()}`
+      - A给B传数据 `{this.props.render(name)}`
+      - 给name 返`<B name={name}/>`
+  - vue插槽
+    - 在子组件要显示其他组件的地方准备好`{this.props.render()}`
+    - 在父组件写render 传其他组件和数据
+    - render可以是别的名字 返回值是一个函数就行 反正会回调
+- 错误边界 error boundary
+  - 要用webpack进行打包 
+    - 把less、es6等打包生成html等 处理好兼容性、语法检查等问题
+    - 不打包的话开发者工具就是红色的 只通过npm启动dev server开启的服务器
+    - 在服务器上部署静态资源
+  - 1. express框架 ---- Node 快速搭建服务器
+  - 2. 第三方库 serve
+      - serve build （build文件夹）
+  - json数组<=>数组包对象
+  - 把错误限制在子组件内部 展示降级UI
+    - getDerivedStateFromProps如果state完全取决于外部的props时用
+    - **getDerivedStateFromError钩子** 子组件报错时调用 携带error
+      - 要加static 静态方法
+    - 错误边界只适用于生产环境 不能用于开发环境
+      - 生产环境（build后放到服务器上）错误被限制在子组件内 app不会挂
+      - 开发环境还是会老实报错
+  - **componentDidCatch钩子**
+    - 报错时调用 只能捕获生命周期中的错误 包括render（现在可以了from弹幕）
+    - 一般用于统计次数用 处理错误的副作用
+- 组件间通信方式总结
+  - README.md

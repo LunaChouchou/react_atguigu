@@ -1,0 +1,54 @@
+## React UI组件库
+- antd的基本使用
+  - 安装antd
+    - yarn add antd
+    - 引入Button
+    - 'react' 'antd' 第三方库/包
+    - 引入antd.css （好像不用了）
+      - 能省略后缀的只有.js, .jsx
+  - 组件
+  - 图标
+    - antd有很多子库 以前是n合一的 有的分离出来了 图标 '@ant-design/icons'
+  - 高级配置找API 可以用的属性们
+  - antd适用的项目 成型的后台管理系统
+    - element-ui 饿了么 vue→react
+    - antd react→vue
+    - vant vue 针对移动端
+## 过时内容 直接看antd doc
+- antd样式的按需引入（3.x 该操作在5.x不需要了 使用CSS-in-JS打包好了）
+  - antd.css包含所有样式 比较大60kb 为了不引入它 只按需引入 需要：
+  - 文档
+    - 详细的配置看3.x版本
+    - 对create-react-app的默认配置进行自定义（create时都是默认配置）
+      - 用了webpack 配置隐藏起来了
+      - package.json eject命令 用于暴露配置
+      - yarn eject
+      - y 该操作不可撤销
+      - config, script文件夹
+        - webpack.config.js
+        - plugin 需要下载、引入、实例化 loader只需要下载、直接用
+        - path.js 解析路径用
+        - webpackDevServer.config.js DevServer详细设置
+      - 尽量避免eject后手动更改 可以用下列方法
+  - 步骤
+    - 安装命令
+      - 新建config-overrides.js 样式修改规则
+      - yarn add react-app-rewired customize-cra
+        - customize-cra库 执行修改命令
+          - 原来启动的命令就不能用了 yarn start/npm start
+        - react-app-rewired库 需要用这个库启动脚手架
+    - 修改启动项目命令
+      - 修改package.json 除了eject
+      - react-scripts → react-app-rewired
+      - react-app-rewired start
+    - config-overrides.js
+      - 在根目录
+      - 用common js语法暴露一个函数 可以接到原有的配置启动脚手架
+    - 安装babel-plugin-import库 按需加载样式的babel插件
+      - yarn add babel-plugin-import
+- antd自定义主题（5.x弃用less 使用CSS-in-JS 这里是3.x）
+  - 安装一个less插件
+  - webpack配置 addLessLoader最简单的配置
+    - 最新less写法更新 改成lessOptions了
+  - @primary-color less文件里定义的主题颜色变量 覆盖颜色
+  - README.md笔记
