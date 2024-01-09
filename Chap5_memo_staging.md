@@ -5,7 +5,7 @@
 - 对路由的理解
   - 路由链接 `<a>`  引起路径发生变化 不带.html的
     - /home 组件 不会引起页面跳转画面刷新
-    - /home.html home页面
+    - /home.html home页面刷新
   - 前端路由工作原理
     - 更改路径→路由在监测地址栏路径的变化→展示对应组件
     - 路由拿到的不是url全体 而是ip后边的path /home /about之类的
@@ -110,6 +110,24 @@
   - NavLink
   - Redirect
   - setState
+- 解决样式丢失问题
+  - localhost3000 通过脚手架webpack配置的 devServer开启的服务器
+    - public文件夹作为内置的根路径
+    - 如果请求不存在的资源 会返回public的index.html
+  - 前端路由在点link的时候不发送网络请求（浏览器监测路径变化展示对应内容）
+    - 路由路径是多级路径时 刷新页面会丢失样式（public/index.html内引用的css文件） 会把多级路径一起当做根路由去请求资源
+    - 路由路径/atguigu/home→刷新时index.html的.变为localhost3000/atguigu→实际请求路径public/atguigu/...
+      - 据说新版本已解决
+      - （really？怎么会把路由路径和资源根路径混为一谈？）
+  - shift+f5 强制刷新 不走缓存
+  - 解决办法
+    - css路径 ./改为/
+      - ./ 当前所在位置（路由路径 因为是public下的文件）+css路径
+      - / 根目录public+css路径
+    - %PUBLIC_URL%/...
+      - 代表public绝对路径 根目录public+css路径
+    - 改用HashRouter（少见）
+      - #后的内容都认为是前端资源 都是哈希值 刷新时#后的内容不发送给服务器
 - BrowserRouter与HashRouter
   - README.md 十三
   - 改变路径会留下历史记录
@@ -119,10 +137,11 @@
       - #后的东西不认为是请求资源的路径 不会发送给服务器
       - 锚点能形成历史记录 不会发送给服务器 
       - 对老版本兼容性更好
-  - params和search的path会带参数 state不带 hash有#
-  - 路由的state参数
-    - BrowserRouter刷新后history仍然存在
-      - state保存在history里
-      - props里的history.location.state 就是 location.state
-    - HashRouter不行
-      - history没了 state没保存
+  - 区别
+    - params和search的path会带参数 state不带 hash有#
+    - 路由的state参数
+      - BrowserRouter刷新后history仍然存在
+        - state保存在history里
+        - props里的history.location.state 就是 location.state
+      - HashRouter不行
+        - history没了 state没保存
