@@ -8,13 +8,13 @@
       - `npm install -g create-react-app`
       - `npm i create-react-app -g`
     - cmd cls 清空屏幕
-    - create-react-app react_staging（项目名）
+    - `create-react-app react_staging`（项目名）
       - 创建react项目 安装依赖
-      - yarn start 开启开发者服务器
-      - yarn build 写完的项目最终打包 生成静态文件
+      - `yarn start` 开启开发者服务器
+      - `yarn build` 写完的项目最终打包 生成静态文件
         - 交给后端部署
-      - yarn test 几乎不用这种单独的测试库
-      - yarn eject 
+      - `yarn test` 几乎不用这种单独的测试库
+      - `yarn eject` 
         - react写好了webpack的配置文件 默认把所有文件隐藏
         - webpack.config.js等等
         - 暴露webpack所有配置文件 无法撤销

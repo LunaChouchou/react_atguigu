@@ -123,9 +123,9 @@
   - 解决办法
     - css路径 ./改为/
       - ./ 当前所在位置（路由路径 因为是public下的文件）+css路径
-      - / 根目录public+css路径
+      - / 根目录public +css路径
     - %PUBLIC_URL%/...
-      - 代表public绝对路径 根目录public+css路径
+      - 代表public绝对路径 根目录public +css路径
     - 改用HashRouter（少见）
       - #后的内容都认为是前端资源 都是哈希值 刷新时#后的内容不发送给服务器
 - BrowserRouter与HashRouter
